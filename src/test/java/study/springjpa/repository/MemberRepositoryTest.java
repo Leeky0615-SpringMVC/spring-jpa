@@ -1,5 +1,6 @@
 package study.springjpa.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,12 +13,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
+@Slf4j
 class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
 
     @Test
     public void testMember(){
+        log.info("memberRepository={}", memberRepository.getClass());
         Member member = new Member("memberA");
         Member saveMember = memberRepository.save(member);
 
