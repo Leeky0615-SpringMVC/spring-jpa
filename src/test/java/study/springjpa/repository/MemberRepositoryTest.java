@@ -10,6 +10,7 @@ import study.springjpa.dto.MemberDto;
 import study.springjpa.entity.Member;
 import study.springjpa.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,19 +92,6 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void findUsernameList(){
-        Member m1 = new Member("AAA", 10);
-        Member m2 = new Member("AAA", 20);
-        memberRepository.save(m1);
-        memberRepository.save(m2);
-
-        List<String> result = memberRepository.findUsernameList();
-        for (String s : result) {
-            log.info("username={}", s);
-        }
-    }
-
-    @Test
     public void findMemberDto(){
         Team teamA = new Team("teamA");
         teamRepository.save(teamA);
@@ -116,6 +104,19 @@ class MemberRepositoryTest {
         List<MemberDto> result = memberRepository.findMemberDto();
         for (MemberDto dto : result) {
             log.info("dto={}", dto);
+        }
+    }
+
+    @Test
+    public void findByNames(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> result = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+        for (Member member : result) {
+            log.info("member={}", member);
         }
     }
 
