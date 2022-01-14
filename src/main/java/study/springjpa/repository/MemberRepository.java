@@ -41,7 +41,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOptionalByUsername(String username);
 
 
-    //Slice<member> : '더보기' 같은 기능 전체 페이지수나, 개수가 없다.
+    /**
+     * Slice<member> : '더보기' 같은 기능 전체 페이지수나, 개수가 없다.
+     * 쿼리가 복잡한 경우에는 성능 테스트를 해보고 count 쿼리를 나누어야 한다.
+     */
+    @Query(value = "select m from Member m",
+            countQuery = "select count(m.username) from Member m")
     Page<Member> findByAge(int age, Pageable pageable);
 
 }
