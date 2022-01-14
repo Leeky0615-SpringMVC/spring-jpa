@@ -13,6 +13,8 @@ import study.springjpa.dto.MemberDto;
 import study.springjpa.entity.Member;
 import study.springjpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +27,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class MemberRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
-    @Autowired TeamRepository teamRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
-    public void testMember(){
+    public void testMember() {
         log.info("memberRepository={}", memberRepository.getClass());
         Member member = new Member("memberA");
         Member saveMember = memberRepository.save(member);
@@ -42,7 +48,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void basicCRUD(){
+    public void basicCRUD() {
         Member member1 = new Member("member1");
         Member member2 = new Member("member2");
         memberRepository.save(member1);
@@ -72,7 +78,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void findByUserNameAndAgeGreaterThen(){
+    public void findByUserNameAndAgeGreaterThen() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("AAA", 20);
         memberRepository.save(m1);
@@ -85,7 +91,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void testQuery(){
+    public void testQuery() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("AAA", 20);
         memberRepository.save(m1);
@@ -96,7 +102,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void findMemberDto(){
+    public void findMemberDto() {
         Team teamA = new Team("teamA");
         teamRepository.save(teamA);
 
@@ -112,7 +118,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void findByNames(){
+    public void findByNames() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("BBB", 20);
         memberRepository.save(m1);
@@ -125,7 +131,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void returnType(){
+    public void returnType() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("BBB", 20);
         memberRepository.save(m1);
@@ -141,7 +147,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void paging(){
+    public void paging() {
         //given
         memberRepository.save(new Member("member1", 10));
         memberRepository.save(new Member("member2", 10));
@@ -156,6 +162,8 @@ class MemberRepositoryTest {
         //when
         Page<Member> page = memberRepository.findByAge(age, pageRequest);
 
+        Page<MemberDto> toMap = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+
         //then
         List<Member> content = page.getContent();
         for (Member member : content) {
@@ -166,6 +174,24 @@ class MemberRepositoryTest {
         assertThat(page.getTotalPages()).isEqualTo(2);
         assertThat(page.isFirst()).isTrue();
         assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate(){
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+//        em.clear();
+
+        Member member5 = memberRepository.findMemberByUsername("member5");
+        System.out.println("member5.getAge() = " + member5.getAge());
+        //then
+        assertThat(resultCount).isEqualTo(3);
     }
 
 }
